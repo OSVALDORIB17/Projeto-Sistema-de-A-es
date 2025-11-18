@@ -1,21 +1,16 @@
 import sqlite3
-import os # Importado para ajudar a gerenciar o arquivo do banco de dados
+import os
 
-# Nome do arquivo do banco de dados
 DB_FILE = 'portfolio_acoes.db'
-
-# --- Funções de Banco de Dados ---
 
 def conectar():
     """Conecta ao banco de dados ou cria o arquivo se não existir."""
-    # Usamos 'with' para garantir que a conexão seja fechada automaticamente
     return sqlite3.connect(DB_FILE)
 
 def criar_tabela():
     """Cria a tabela ACOES se ela ainda não existir."""
     conn = conectar()
     cursor = conn.cursor()
-    # SQL para criar a tabela com os tipos de dados corretos
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS ACOES (
             ticker TEXT PRIMARY KEY,
@@ -24,10 +19,10 @@ def criar_tabela():
             preco_medio REAL NOT NULL
         );
     ''')
-    conn.commit() # Confirma a criação da tabela
+    conn.commit() 
     conn.close()
 
-# --- Funções do Sistema (CRUD com SQLite) ---
+
 
 def criar_acao_db(ticker, empresa, quantidade, preco):
     """Operação CREATE: Adiciona uma nova ação ao banco de dados."""
@@ -39,7 +34,7 @@ def criar_acao_db(ticker, empresa, quantidade, preco):
         conn.commit()
         print(f"\nSUCESSO: Ação {ticker.upper()} adicionada ao portfolio.")
     except sqlite3.IntegrityError:
-        # Lida com a tentativa de inserir um ticker duplicado (chave primária)
+       
         print(f"\nERRO: Ação {ticker.upper()} já existe. Use a função de Atualizar.")
     finally:
         conn.close()
@@ -49,7 +44,7 @@ def ler_portfolio_db():
     conn = conectar()
     cursor = conn.cursor()
     cursor.execute("SELECT ticker, empresa, quantidade, preco_medio FROM ACOES ORDER BY ticker")
-    acoes = cursor.fetchall() # Obtém todos os resultados
+    acoes = cursor.fetchall() 
     conn.close()
 
     print("\n--- PORTFOLIO DE AÇÕES (SQLite) ---")
@@ -73,7 +68,6 @@ def atualizar_acao_db(ticker, nova_quantidade, novo_preco):
     conn = conectar()
     cursor = conn.cursor()
     
-    # Primeiro, recuperamos os dados atuais para recalcular o preço médio ponderado
     cursor.execute("SELECT quantidade, preco_medio FROM ACOES WHERE ticker = ?", (ticker.upper(),))
     dados_atuais = cursor.fetchone()
 
@@ -81,7 +75,6 @@ def atualizar_acao_db(ticker, nova_quantidade, novo_preco):
         qtd_antiga, preco_antigo = dados_atuais
         qtd_total = qtd_antiga + nova_quantidade
         
-        # Evita divisão por zero se a quantidade total for zero
         if qtd_total == 0:
             novo_preco_medio = 0.0
         else:
@@ -89,7 +82,6 @@ def atualizar_acao_db(ticker, nova_quantidade, novo_preco):
             valor_novo_investimento = nova_quantidade * novo_preco
             novo_preco_medio = (valor_total_antigo + valor_novo_investimento) / qtd_total
 
-        # Executa o UPDATE no banco de dados
         cursor.execute("UPDATE ACOES SET quantidade = ?, preco_medio = ? WHERE ticker = ?", 
                        (qtd_total, novo_preco_medio, ticker.upper()))
         conn.commit()
@@ -103,7 +95,6 @@ def deletar_acao_db(ticker):
     """Operação DELETE: Remove uma ação do banco de dados."""
     conn = conectar()
     cursor = conn.cursor()
-    # Executa o DELETE no banco de dados
     cursor.execute("DELETE FROM ACOES WHERE ticker = ?", (ticker.upper(),))
     conn.commit()
 
@@ -116,7 +107,6 @@ def deletar_acao_db(ticker):
 
 def menu_principal():
     """Função principal que gerencia a interação com o usuário."""
-    # Garante que a tabela exista antes de iniciar o menu
     criar_tabela() 
     
     while True:
@@ -153,6 +143,6 @@ def menu_principal():
         else:
             print("\nOpção inválida. Tente novamente.")
 
-# --- Execução do Programa ---
 if __name__ == "__main__":
     menu_principal()
+
