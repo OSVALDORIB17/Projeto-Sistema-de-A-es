@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+
+    <div style="width: 450px; background-color: rgb(32, 32, 32); padding: 25px; border-radius: 8px;">
+
+        <h1 class="text-light mb-4">Atributos do Produto</h1>
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+        </form>
+
+    </div>
+
+</div>
+
+<style>
+    /* Deixa os inputs do Django iguais ao padrão do seu site */
+    .container input,
+    .container select,
+    .container textarea {
+        background-color: rgb(20,20,20) !important;
+        border: 1px solid #444 !important;
+        color: white !important;
+        padding: 8px !important;
+        border-radius: 4px !important;
+        width: 100%;
+    }
+
+    label {
+        color: white;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    .container input:focus,
+    .container select:focus,
+    .container textarea:focus {
+        border-color: #6fa8dc !important;
+        box-shadow: none !important;
+    }
+
+    /* Estiliza os <p> do form.as_p */
+    form p {
+        margin-bottom: 12px;
+    }
+</style>
+
+{% endblock %}
